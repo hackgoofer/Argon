@@ -14,6 +14,7 @@ import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
+import axios from 'axios';
 
 const Buttons = styled.div`
   display: inline-block;
@@ -44,6 +45,17 @@ function generateTwoNumsWithDistance(distance, min, max) {
     return [num1, num2];
   }
   return generateTwoNumsWithDistance(distance, min, max);
+}
+
+// Utility function to convert base64 to ArrayBuffer
+function base64ToArrayBuffer(base64) {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
 }
 
 function App() {
@@ -151,7 +163,7 @@ function App() {
       wavesurferRef.current = waveSurfer;
 
       if (wavesurferRef.current) {
-        wavesurferRef.current.load("/sample.mp3");
+        wavesurferRef.current.load("/sample-9s.mp3");
 
         wavesurferRef.current.on("region-created", regionCreatedHandler);
 
@@ -276,6 +288,30 @@ function App() {
     wavesurferRef.current.zoom(50);
   };
 
+  const handleClick = async () => {
+    try {
+        // Get the audio file from server
+        const response = await axios.get('http://127.0.0.1:5000/generate', {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+        });
+
+        // Assuming server sends JSON like: { "audio": "base64AudioData" }
+        const base64Audio = response.data.audio;
+        // Convert base64 to ArrayBuffer
+        const audioData = base64ToArrayBuffer(base64Audio);
+        // Convert ArrayBuffer to Blob
+        const blob = new Blob([audioData], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(blob);
+
+        // Load the audio into WaveSurfer
+        wavesurferRef.current.load(audioUrl);
+    } catch (error) {
+        console.error('Error fetching audio: ', error);
+    }
+  }
+
   return (
     <div className="App">
       <WaveSurfer plugins={plugins} onMount={handleWSMount}>
@@ -316,6 +352,7 @@ function App() {
         <Button onClick={shuffleLastMarker}>Shuffle last marker</Button>
         <Button onClick={toggleTimeline}>Toggle timeline</Button>
         <Button onClick={setZoom50}>zoom 50%</Button>
+        <Button onClick={handleClick}>Generate</Button>
       </Buttons>
     </div>
   );

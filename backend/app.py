@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 import base64
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes
 
 @app.route('/generate', methods=['GET'])
 def generate():
@@ -16,8 +18,10 @@ def generate():
     # For now, let's use a dummy audio_buffer:
     audio_buffer = b"Dummy audio buffer"
 
-    audio_base64 = base64.b64encode(audio_buffer).decode('utf-8')
-
+    # audio_base64 = base64.b64encode(audio_buffer).decode('utf-8')
+    with open("audio.txt") as f:
+        audio_base64 = f.read()
+    # audio_base64 = 'data:audio/wav;base64,' + audio_base64
     return jsonify({'audio': audio_base64})
 
 # Function to generate audio. This is a placeholder, fill it with your logic.
