@@ -105,30 +105,30 @@ function App() {
     {
       id: "region-1",
       start: 0.5,
-      end: 10,
+      end: 5,
       color: "rgba(0, 0, 0, .5)",
       data: {
         systemRegionId: 31
       }
     },
-    {
-      id: "region-2",
-      start: 5,
-      end: 25,
-      color: "rgba(225, 195, 100, .5)",
-      data: {
-        systemRegionId: 32
-      }
-    },
-    {
-      id: "region-3",
-      start: 15,
-      end: 35,
-      color: "rgba(25, 95, 195, .5)",
-      data: {
-        systemRegionId: 33
-      }
-    }
+    // {
+    //   id: "region-2",
+    //   start: 5,
+    //   end: 25,
+    //   color: "rgba(225, 195, 100, .5)",
+    //   data: {
+    //     systemRegionId: 32
+    //   }
+    // },
+    // {
+    //   id: "region-3",
+    //   start: 15,
+    //   end: 35,
+    //   color: "rgba(25, 95, 195, .5)",
+    //   data: {
+    //     systemRegionId: 33
+    //   }
+    // }
   ]);
 
   // use regions ref to pass it inside useCallback
@@ -291,12 +291,13 @@ function App() {
   const handleClick = async () => {
     try {
         // Get the audio file from server
-        const response = await axios.get('http://127.0.0.1:5000/generate', {
+        const response = await axios.get('http://blq021kk.ngrok.app:80/generate', {
             headers: {
               'Content-Type': 'application/json',
             },
         });
-
+        
+        console.log(response)
         // Assuming server sends JSON like: { "audio": "base64AudioData" }
         const base64Audio = response.data.audio;
         // Convert base64 to ArrayBuffer
